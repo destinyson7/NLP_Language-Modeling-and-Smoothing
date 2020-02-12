@@ -1,6 +1,7 @@
 import nltk
 import sys
 import re
+import math
 from nltk.tokenize import word_tokenize
 
 
@@ -115,7 +116,7 @@ def trigram_vocabulary(trigrams):
 
 
 def kneser_ney_unigrams(unigrams, tokenized_inp):
-    cur = 1
+    cur = 0
     d = 0.25
 
     total = total_unigrams(unigrams)
@@ -136,13 +137,13 @@ def kneser_ney_unigrams(unigrams, tokenized_inp):
             # print(prob)
             prob += (d/total)
 
-            cur *= prob
+            cur += math.log(prob)
 
-    return cur
+    return math.exp(cur)
 
 
 def kneser_ney_bigrams(bigrams, tokenized_inp, unigrams):
-    cur = 1
+    cur = 0
     d = 0.75
 
     vocabulary = bigram_vocabulary(bigrams)
@@ -156,7 +157,7 @@ def kneser_ney_bigrams(bigrams, tokenized_inp, unigrams):
 
             if sentence[i - 1] not in unigrams:
                 p = (d/tot_unigrams)*(uni_vocabulary/vocabulary)
-                cur *= p
+                cur += math.log(p)
 
             else:
                 cnt = 0
@@ -182,14 +183,14 @@ def kneser_ney_bigrams(bigrams, tokenized_inp, unigrams):
 
                 p += (lambda1 * p2)
 
-                cur *= p
+                cur += math.log(p)
 
-    return cur
+    return math.exp(cur)
 
 
 def kneser_ney_trigrams(trigrams, tokenized_inp, unigrams, bigrams):
     d = 9
-    cur = 1
+    cur = 0
 
     vocabulary = trigram_vocabulary(trigrams)
     bi_vocabulary = bigram_vocabulary(bigrams)
@@ -201,16 +202,16 @@ def kneser_ney_trigrams(trigrams, tokenized_inp, unigrams, bigrams):
 
         for i in range(2, length):
             if sentence[i-2] not in unigrams:
-                prob = p = (d/tot_unigrams)*(uni_vocabulary/vocabulary)
-                cur *= p
+                prob = (d/tot_unigrams)*(uni_vocabulary/vocabulary)
+                cur += math.log(prob)
 
             elif sentence[i-1] not in unigrams:
-                prob = p = (d/tot_unigrams)*(uni_vocabulary/vocabulary)
-                cur *= p
+                prob = (d/tot_unigrams)*(uni_vocabulary/vocabulary)
+                cur += math.log(prob)
 
             elif sentence[i-1] not in bigrams[sentence[i-2]]:
-                prob = p = (d/tot_unigrams)*(uni_vocabulary/vocabulary)
-                cur *= p
+                prob = (d/tot_unigrams)*(uni_vocabulary/vocabulary)
+                cur += math.log(prob)
 
             else:
                 cnt = 0
@@ -251,13 +252,13 @@ def kneser_ney_trigrams(trigrams, tokenized_inp, unigrams, bigrams):
                 p2 += lambda2*p3
                 p += lambda1*p2
 
-                cur *= p
+                cur += math.log(p)
 
-    return cur
+    return math.exp(cur)
 
 
 def witten_bell_unigrams(unigrams, tokenized_inp):
-    cur = 1
+    cur = 0
     d = 0.25
 
     total = total_unigrams(unigrams)
@@ -266,20 +267,20 @@ def witten_bell_unigrams(unigrams, tokenized_inp):
     for sentence in tokenized_inp:
         for word in sentence:
             if word not in unigrams:
-                cur *= (d/total)
+                cur += math.log((d/total))
                 # print(d/total)
 
             else:
                 cnt = unigrams[word]
                 p = cnt / (total + len(unigrams))
-                cur *= p
+                cur += math.log(p)
                 # print(p)
 
-    return cur
+    return math.exp(cur)
 
 
 def witten_bell_bigrams(bigrams, tokenized_inp, unigrams):
-    cur = 1
+    cur = 0
     d = 0.75
 
     vocabulary = bigram_vocabulary(bigrams)
@@ -293,11 +294,11 @@ def witten_bell_bigrams(bigrams, tokenized_inp, unigrams):
 
             if sentence[i - 1] not in unigrams:
                 p = (d/tot_unigrams)*(uni_vocabulary/vocabulary)
-                cur *= p
+                cur += math.log(p)
 
             elif sentence[i] not in unigrams:
                 p = (d/tot_unigrams)*(uni_vocabulary/vocabulary)
-                cur *= p
+                cur += math.log(p)
 
             else:
                 tot = len(bigrams[sentence[i - 1]])
@@ -324,13 +325,13 @@ def witten_bell_bigrams(bigrams, tokenized_inp, unigrams):
 
                 # print(lambda1, first_term, second_term, p)
 
-                cur *= p
+                cur += math.log(p)
 
-    return cur
+    return math.exp(cur)
 
 
 def witten_bell_trigrams(trigrams, tokenized_inp, unigrams, bigrams):
-    cur = 1
+    cur = 0
     d = 9
 
     tot_unigrams = total_unigrams(unigrams)
@@ -343,23 +344,23 @@ def witten_bell_trigrams(trigrams, tokenized_inp, unigrams, bigrams):
         for i in range(2, length):
 
             if sentence[i - 2] not in unigrams:
-                prob = p = (d/tot_unigrams)*(uni_vocabulary/vocabulary)
-                cur *= p
+                prob = (d/tot_unigrams)*(uni_vocabulary/vocabulary)
+                cur += math.log(prob)
 
             elif sentence[i - 1] not in unigrams:
-                prob = p = (d/tot_unigrams)*(uni_vocabulary/vocabulary)
-                cur *= p
+                prob = (d/tot_unigrams)*(uni_vocabulary/vocabulary)
+                cur += math.log(prob)
 
             elif sentence[i - 1] not in bigrams[sentence[i - 2]]:
-                prob = p = (d/tot_unigrams)*(uni_vocabulary/vocabulary)
-                cur *= p
+                prob = (d/tot_unigrams)*(uni_vocabulary/vocabulary)
+                cur += math.log(prob)
 
             else:
                 tot = len(trigrams[sentence[i - 2]][sentence[i - 1]])
 
                 tot_den = tot + bigrams[sentence[i - 2]][sentence[i - 1]]
 
-                lambda1 = 1 - tot/tot_den
+                lambda1 = 1 - (tot/tot_den)
 
                 if sentence[i] in trigrams[sentence[i - 2]][sentence[i - 1]]:
                     first_term = trigrams[sentence[i - 2]][sentence[i - 1]][sentence[i]]
@@ -378,9 +379,10 @@ def witten_bell_trigrams(trigrams, tokenized_inp, unigrams, bigrams):
                 # print([nltk.word_tokenize(sentence[i - 1] + " " + sentence[i])])
 
                 p = lambda1 * first_term + (1 - lambda1) * second_term
-                cur *= p
+                # print(p)
+                cur += math.log(p)
 
-    return cur
+    return math.exp(cur)
 
 
 n = sys.argv[1]
