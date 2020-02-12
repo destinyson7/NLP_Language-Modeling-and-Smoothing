@@ -1,4 +1,5 @@
 
+
 Language Modeling and Smoothing
 ==================
 Given a training corpus corpus.txt, use it to create an n-gram language model, where n can be provided as a parameter. Perform smoothing on the language model using:
@@ -18,3 +19,6 @@ The Kneser Ney smoothing is an extension of absolute discounting with a clever w
 The motivation of the Witten Bell smoothing is to interpret λ as the probability of using the higher-order model. We should use higher-order model if the n-gram was seen in the training data, and back off to lower-order model otherwise. So 1−λ should be the probability that a word not seen after the (n-1) gram in the training data occurs after that history in test data. We estimate this by the number of unique words that follow the history i.e. (n-1) gram in the training data.
 
 After rigorous testing on this simple language model, it has been observed that the Kneser Ney technique consistently outperforms the Witten Bell technique. Witten Bell Smoothing is more conservative when subtracting probability mass and gives good probability estimates. Kneser Ney discounting augments absolute discounting with a more sophisticated way to handle the backoff distribution using linear interpolation and gives even better estimates than the Witten Bell Smoothing in most of the cases.
+
+
+#### Tanish Lad (2018114005)
