@@ -9,7 +9,7 @@ Given a training corpus corpus.txt, use it to create an n-gram language model, w
 ```python
 python3 language_model.py <value of n> <smoothing type> <path to input corpus>
 ```
-+ where n can be between 1 and 3, and smoothing type can be k for Kneser Ney or w for Witten Bell.
+where n can be between 1 and 3, and smoothing type can be k for Kneser Ney or w for Witten Bell.
 
 #### Q.  Compare the models of smoothing and explain in which cases the outputs of the two smoothing mechanisms differ and why
 
