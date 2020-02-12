@@ -154,7 +154,7 @@ def kneser_ney_bigrams(bigrams, tokenized_inp, unigrams):
 
         for i in range(1, length):
 
-            if sentence[i-1] not in unigrams:
+            if sentence[i - 1] not in unigrams:
                 p = (d/tot_unigrams)*(uni_vocabulary/vocabulary)
                 cur *= p
 
@@ -178,7 +178,7 @@ def kneser_ney_bigrams(bigrams, tokenized_inp, unigrams):
 
                 p2 = max(tot - d, 0)/vocabulary
                 lambda2 = (d/tot_unigrams)*uni_vocabulary
-                p2 += (lambda2/vocabulary)
+                p2 += (lambda2/uni_vocabulary)
 
                 p += (lambda1 * p2)
 
@@ -188,7 +188,7 @@ def kneser_ney_bigrams(bigrams, tokenized_inp, unigrams):
 
 
 def kneser_ney_trigrams(trigrams, tokenized_inp, unigrams, bigrams):
-    d = 7
+    d = 9
     cur = 1
 
     vocabulary = trigram_vocabulary(trigrams)
@@ -258,7 +258,7 @@ def kneser_ney_trigrams(trigrams, tokenized_inp, unigrams, bigrams):
 
 def witten_bell_unigrams(unigrams, tokenized_inp):
     cur = 1
-    d = 0.75
+    d = 0.25
 
     total = total_unigrams(unigrams)
     # print(total)
@@ -331,7 +331,7 @@ def witten_bell_bigrams(bigrams, tokenized_inp, unigrams):
 
 def witten_bell_trigrams(trigrams, tokenized_inp, unigrams, bigrams):
     cur = 1
-    d = 0.75
+    d = 9
 
     tot_unigrams = total_unigrams(unigrams)
     uni_vocabulary = unigram_vocabulary(unigrams)
@@ -357,10 +357,7 @@ def witten_bell_trigrams(trigrams, tokenized_inp, unigrams, bigrams):
             else:
                 tot = len(trigrams[sentence[i - 2]][sentence[i - 1]])
 
-                tot_den = tot
-
-                for j in trigrams[sentence[i - 2]][sentence[i - 1]]:
-                    tot_den += trigrams[sentence[i - 2]][sentence[i - 1]][j]
+                tot_den = tot + bigrams[sentence[i - 2]][sentence[i - 1]]
 
                 lambda1 = 1 - tot/tot_den
 
@@ -371,15 +368,14 @@ def witten_bell_trigrams(trigrams, tokenized_inp, unigrams, bigrams):
                     first_term = len(trigrams[sentence[i - 2]][sentence[i - 1]]) / \
                         (uni_vocabulary - len(trigrams[sentence[i - 2]][sentence[i - 1]]))
 
-                first_term_den = len(trigrams[sentence[i - 2]][sentence[i - 1]])
-
-                for j in trigrams[sentence[i - 2]][sentence[i - 1]]:
-                    first_term_den += trigrams[sentence[i - 2]][sentence[i - 1]][j]
-
+                first_term_den = len(trigrams[sentence[i - 2]][sentence[i - 1]]
+                                     ) + bigrams[sentence[i - 2]][sentence[i - 1]]
                 first_term /= first_term_den
 
                 second_term = witten_bell_bigrams(
                     bigrams, [nltk.word_tokenize(sentence[i - 1] + " " + sentence[i])], unigrams)
+
+                # print([nltk.word_tokenize(sentence[i - 1] + " " + sentence[i])])
 
                 p = lambda1 * first_term + (1 - lambda1) * second_term
                 cur *= p
