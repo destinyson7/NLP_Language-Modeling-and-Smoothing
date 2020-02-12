@@ -412,10 +412,21 @@ sent = [nltk.word_tokenize(s) for s in sent]
 
 # print(sent)
 if sent:
-    print(kneser_ney_unigrams(unigrams, sent))
-    print(kneser_ney_bigrams(bigrams, sent, unigrams))
-    print(kneser_ney_trigrams(trigrams, sent, unigrams, bigrams))
 
-    print(witten_bell_unigrams(unigrams, sent))
-    print(witten_bell_bigrams(bigrams, sent, unigrams))
-    print(witten_bell_trigrams(trigrams, sent, unigrams, bigrams))
+    if n == "1" and type == "k":
+        print(kneser_ney_unigrams(unigrams, sent))
+
+    elif n == "2" and type == "k":
+        print(kneser_ney_bigrams(bigrams, sent, unigrams))
+
+    elif n == "3" and type == "k":
+        print(kneser_ney_trigrams(trigrams, sent, unigrams, bigrams))
+
+    elif n == "1" and type == "w":
+        print(witten_bell_unigrams(unigrams, sent))
+
+    elif n == "2" and type == "w":
+        print(witten_bell_bigrams(bigrams, sent, unigrams))
+
+    elif n == "3" and type == "w":
+        print(witten_bell_trigrams(trigrams, sent, unigrams, bigrams))
